@@ -37,16 +37,15 @@ fn main() {
             CodeModel::Default,
         )
         .unwrap();
-
     module.set_triple(&target_triple);
     module.set_data_layout(&target_machine.get_target_data().get_data_layout());
 
     module.print_to_stderr();
-    // // Optimization passes
-    // let fpm = PassManager::create(&module);
-    // target_machine.add_analysis_passes(&fpm);
-    // fpm.initialize();
-    // fpm.run_on(&function);
+    
+    // Optimization passes
+    let fpm = PassManager::create(&module);
+    target_machine.add_analysis_passes(&fpm);
+    fpm.initialize();
 
     // Write object file
     let object_file_path = Path::new("my_module.o");
