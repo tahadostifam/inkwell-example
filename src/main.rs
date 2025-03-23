@@ -26,7 +26,6 @@ fn main() {
     let target_triple = TargetMachine::get_default_triple();
     let cpu = TargetMachine::get_host_cpu_name().to_string();
     let features = TargetMachine::get_host_cpu_features().to_string();
-
     let target = Target::from_triple(&target_triple).unwrap();
     let target_machine = target
         .create_target_machine(
@@ -42,13 +41,12 @@ fn main() {
     module.set_triple(&target_triple);
     module.set_data_layout(&target_machine.get_target_data().get_data_layout());
 
-    // Optimization passes
-    let fpm = PassManager::create(&module);
-    target_machine.add_analysis_passes(&fpm);
-    
-    fpm.initialize();
-
-    fpm.run_on(&function);
+    module.print_to_stderr();
+    // // Optimization passes
+    // let fpm = PassManager::create(&module);
+    // target_machine.add_analysis_passes(&fpm);
+    // fpm.initialize();
+    // fpm.run_on(&function);
 
     // Write object file
     let object_file_path = Path::new("my_module.o");
@@ -58,7 +56,7 @@ fn main() {
 
     // Link object file into executable (using system linker)
     let output_executable_path = Path::new("my_executable");
-    let linker_output = std::process::Command::new("cc") // or clang
+    let linker_output = std::process::Command::new("cc")
         .arg("my_module.o")
         .arg("-o")
         .arg("my_executable")
@@ -70,15 +68,4 @@ fn main() {
         std::fs::remove_file("my_module.o").unwrap();
         return;
     }
-
-    println!("Executable created: my_executable");
-
-    std::fs::remove_file("my_module.o").unwrap();
-
-    // Optionally run the executable
-    let execution_output = std::process::Command::new("./my_executable")
-        .output()
-        .expect("failed to execute executable");
-
-    println!("Executable output: {}", String::from_utf8_lossy(&execution_output.stdout));
 }
